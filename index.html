@@ -1,12 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My 3D Model Viewer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLTF Viewer</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
 </head>
 <body>
-  <a>"this is a file"</a>
-  <model-viewer src="https://NoopurTyagi.github.io/mymodel.gltf" alt="Your 3D Model" autoplay camera-controls></model-viewer>
+    <a-scene>
+        <!-- Add lighting -->
+        <a-light type="ambient" color="#FFF"></a-light>
+        <a-light type="point" intensity="2" position="2 4 4"></a-light>
+        
+        <!-- Load the glTF model -->
+        <a-gltf-model src="https://NoopurTyagi.github.io/mymodel.gltf"></a-gltf-model>
+    </a-scene>
 </body>
 </html>
+  
