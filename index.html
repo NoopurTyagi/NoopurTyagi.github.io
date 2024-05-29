@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GLTF Viewer with Perspective Change</title>
+  <title>GLTF Viewer with Full Camera Control</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
 </head>
 <body>
-  <a>This is my webview of Demorgon Department</a>
+  <a>This is my webpage of Demorgon Department</a>
   <a-scene>
     <a-light type="ambient" color="#FFF"></a-light>
     <a-light type="point" intensity="2" position="2 4 4"></a-light>
 
-    <a-gltf-model src="https://NoopurTyagi.github.io/mymodel.gltf"></a-gltf-model>
+    <a-gltf-model src="https://NoopurTyagi.github.io/mymodel.gltf" position="0 1.5 0"></a-gltf-model>
 
-    <a-cursor camera-controls></a-cursor>
+    <a-entity camera look-controls WASDControls>
+      <a-cursor></a-cursor>
+    </a-entity>
   </a-scene>
 </body>
 </html>
-
-  
