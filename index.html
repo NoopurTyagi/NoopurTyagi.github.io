@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLTF Viewer</title>
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.138.5/build/three.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GLTF Viewer with Perspective Change</title>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
 </head>
 <body>
-    <a> this is my webview of Demorgon Department </a>
-    <a-scene>
-        <!-- Add lighting -->
-        <a-light type="ambient" color="#FFF"></a-light>
-        <a-light type="point" intensity="2" position="2 4 4"></a-light>
-        
-        <!-- Load the glTF model -->
-        <a-gltf-model src="https://NoopurTyagi.github.io/mymodel.gltf"></a-gltf-model>
-    </a-scene>
+  <a>This is my webpage of Demorgon Department</a>
+  <a-scene>
+    <a-light type="ambient" color="#FFF"></a-light>
+    <a-light type="point" intensity="2" position="2 4 4"></a-light>
+
+    <a-gltf-model src="https://NoopurTyagi.github.io/mymodel.gltf"></a-gltf-model>
+
+    <a-cursor camera-controls></a-cursor>
+  </a-scene>
 </body>
 </html>
+
   
