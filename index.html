@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GLTF Viewer with Enhanced Navigation (Three.js)</title>
+  <title>GLTF Viewer with Navigation (Three.js)</title>
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/build/three.min.js"></script>
 </head>
 <body>
-  
   <a-scene>
     <a-light type="ambient" color="#FFF"></a-light>
     <a-light type="point" intensity="2" position="2 4 4"></a-light>
@@ -36,12 +35,12 @@
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true; // Smoother camera movement
 
-    // Error handling and debugging
+    // Error handling (optional)
     function handleError(error) {
       console.error("Error:", error);
     }
 
-    // Function to load the glTF model (optional)
+    // Function to load the glTF model
     function loadGltfModel() {
       const loader = new THREE.GLTFLoader();
       loader.load(
@@ -61,10 +60,10 @@
       renderer.render(scene, camera);
     }
 
-    // Load the model (or call directly if no function)
-    loadGltfModel(); // Uncomment this line if not using a separate function
+    // Load the model
+    loadGltfModel();
 
-    // A-Frame integration (optional)
+    // A-Frame integration (optional - can be removed)
     const aCamera = document.getElementById("camera");
     aCamera.object3D.position = camera.position;
     aCamera.object3D.rotation = camera.quaternion;
