@@ -7,25 +7,15 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/build/three.min.js"></script>
 </head>
 <body>
-  <h1> this is first page </h1>
-  <a-scene>
-    <a-light type="ambient" color="#FFF"></a-light>
-    <a-light type="point" intensity="2" position="2 4 4"></a-light>
-
-    <a-gltf-model id="gltfModel" src="https://NoopurTyagi.github.io/mymodel.gltf" position="0 1.5 0"></a-gltf-model>
-
-    <a-entity id="camera">
-      <a-cursor></a-cursor>
-    </a-entity>
-  </a-scene>
+  <h1>GLTF Viewer</h1>
 
   <script>
     // Three.js scene setup
     const scene = new THREE.Scene();
 
-    // Camera creation
+    // Camera creation (customizable position)
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 5; // Adjust initial position
+    camera.position.set(0, 5, 10); // Adjust initial position (example)
 
     // Renderer setup
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -36,9 +26,10 @@
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true; // Smoother camera movement
 
-    // Error handling (optional)
+    // Error handling
     function handleError(error) {
-      console.error("Error:", error);
+      console.error("Error loading model:", error);
+      alert("Oops! There was an error loading the model. Please try again later.");
     }
 
     // Function to load the glTF model
@@ -64,12 +55,7 @@
     // Load the model
     loadGltfModel();
 
-    // A-Frame integration (optional - can be removed)
-    const aCamera = document.getElementById("camera");
-    aCamera.object3D.position = camera.position;
-    aCamera.object3D.rotation = camera.quaternion;
-
-    animate();
+    // Removed A-Frame integration (optional)
   </script>
 </body>
 </html>
