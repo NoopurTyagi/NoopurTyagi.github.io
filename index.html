@@ -8,7 +8,6 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three-pathfinding"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/Tween.min.js"></script>
 </head>
 <body>
   <h1>Indoor Navigation</h1>
@@ -55,17 +54,9 @@
         scene.add(model);
         console.log('Model loaded successfully');
 
-        // Ensure the model is visible by setting a default position and scale
-        model.position.set(0, 0, 0);
-        model.scale.set(1, 1, 1);
-
         // Create a nav mesh from the loaded model (assuming the model has a proper nav mesh)
         const navMesh = model.getObjectByName('NavMesh'); // Adjust this if needed
-        if (navMesh) {
-          pathfinding.setZoneData(ZONE, Pathfinding.createZone(navMesh.geometry));
-        } else {
-          console.error('NavMesh not found in the model.');
-        }
+        pathfinding.setZoneData(ZONE, Pathfinding.createZone(navMesh.geometry));
       },
       undefined,
       (error) => {
