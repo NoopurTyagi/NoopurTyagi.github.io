@@ -16,6 +16,7 @@
   <script>
     // Scene setup
     const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xdddddd); // Set a background color to better see objects
 
     // Camera setup
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -38,9 +39,11 @@
     directionalLight.position.set(5, 10, 7.5).normalize();
     scene.add(directionalLight);
 
-    // Raycaster setup for mouse interaction
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
+    // Add a simple box to ensure the renderer and camera are working
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
 
     // Pathfinding setup
     const pathfinding = new Pathfinding();
