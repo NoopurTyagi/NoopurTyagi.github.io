@@ -11,12 +11,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/Tween.min.js"></script>
 </head>
 <body>
-  <h1>Indoor Navigation 1</h1>
+  <h1>Indoor Navigation</h1>
 
   <script>
     // Scene setup
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xdddddd); // Set a background color to better see objects
 
     // Camera setup
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -39,11 +38,9 @@
     directionalLight.position.set(5, 10, 7.5).normalize();
     scene.add(directionalLight);
 
-    // Add a simple box to ensure the renderer and camera are working
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
+    // Raycaster setup for mouse interaction
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
 
     // Pathfinding setup
     const pathfinding = new Pathfinding();
@@ -52,11 +49,11 @@
     // Load GLTF model and setup pathfinding
     const loader = new THREE.GLTFLoader();
     loader.load(
-      'https://NoopurTyagi.github.io/mymodel.gltf', // URL of your GLTF model
+      'https://NoopurTyagi.github.io/mymodel.gltf',
       (gltf) => {
         const model = gltf.scene;
         scene.add(model);
-        console.log('Model loaded successfully:', model);
+        console.log('Model loaded successfully');
 
         // Ensure the model is visible by setting a default position and scale
         model.position.set(0, 0, 0);
