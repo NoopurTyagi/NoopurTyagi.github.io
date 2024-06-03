@@ -3,33 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Indoor Navigation (Three.js)</title>
+  <title>GLTF Viewer with Navigation (Three.js)</title>
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three-pathfinding"></script>
 </head>
 <body>
-  <h1>Indoor Navigation</h1>
+  <h1>GLTF Viewer</h1>
 
   <script>
-    // Scene setup
+    // Three.js scene setup
     const scene = new THREE.Scene();
 
-    // Camera setup
+    // Camera creation (customizable position)
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 5, 10);
+    camera.position.set(0, 5, 10); // Adjust initial position (example)
 
     // Renderer setup
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Controls setup
+    // Orbital controls for navigation
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
+    controls.enableDamping = true; // Smoother camera movement
+    controls.dampingFactor = 0.25; // Adjust this to your preference
+    controls.screenSpacePanning = false; // Whether to use screen space panning
+    controls.maxPolarAngle = Math.PI / 2; // Limit vertical rotation
 
-    // Lighting setup
+    // Add lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
 
@@ -37,93 +39,42 @@
     directionalLight.position.set(5, 10, 7.5).normalize();
     scene.add(directionalLight);
 
-    // Raycaster setup for mouse interaction
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
+    // Error handling
+    function handleError(error) {
+      console.error("Error loading model:", error);
+      alert("Oops! There was an error loading the model. Please try again later.");
+    }
 
-    // Pathfinding setup
-    const pathfinding = new Pathfinding();
-    const ZONE = 'level1'; // Arbitrary zone name for pathfinding
+    // Function to load the glTF model
+    function loadGltfModel() {
+      const loader = new THREE.GLTFLoader();
+      loader.load(
+        'https://NoopurTyagi.github.io/mymodel.gltf',
+        (gltf) => {
+          scene.add(gltf.scene);
+          console.log('Model loaded successfully');
+        },
+        undefined, // Optional: function for loading progress
+        handleError
+      );
+    }
 
-    // Load GLTF model and setup pathfinding
-    const loader = new THREE.GLTFLoader();
-    loader.load(
-      'https://NoopurTyagi.github.io/mymodel.gltf',
-      (gltf) => {
-        const model = gltf.scene;
-        scene.add(model);
-        console.log('Model loaded successfully');
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update(); // Required if controls.enableDamping or controls.autoRotate are set to true
+      renderer.render(scene, camera);
+    }
 
-        // Create a nav mesh from the loaded model (assuming the model has a proper nav mesh)
-        const navMesh = model.getObjectByName('NavMesh'); // Adjust this if needed
-        pathfinding.setZoneData(ZONE, Pathfinding.createZone(navMesh.geometry));
-      },
-      undefined,
-      (error) => {
-        console.error('Error loading model:', error);
-        alert('Oops! There was an error loading the model. Please try again later.');
-      }
-    );
-
-    // Handle window resize
+    // Event listener to handle window resizing
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // Handle mouse click for navigation
-    window.addEventListener('click', (event) => {
-      // Calculate mouse position in normalized device coordinates
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-      // Update the raycaster with the camera and mouse position
-      raycaster.setFromCamera(mouse, camera);
-
-      // Find intersections
-      const intersects = raycaster.intersectObjects(scene.children, true);
-
-      if (intersects.length > 0) {
-        const target = intersects[0].point;
-        console.log('Target:', target);
-
-        // Find path
-        const groupID = pathfinding.getGroup(ZONE, camera.position);
-        const path = pathfinding.findPath(camera.position, target, ZONE, groupID);
-
-        if (path) {
-          console.log('Path found:', path);
-
-          // Move camera along the path (simplified)
-          const moveAlongPath = () => {
-            if (path.length === 0) return;
-
-            const nextPoint = path.shift();
-            const tween = new TWEEN.Tween(camera.position)
-              .to({ x: nextPoint.x, y: nextPoint.y, z: nextPoint.z }, 1000)
-              .onUpdate(() => controls.update())
-              .onComplete(() => {
-                if (path.length > 0) moveAlongPath();
-              })
-              .start();
-          };
-
-          moveAlongPath();
-        } else {
-          console.log('No path found');
-        }
-      }
-    });
-
-    // Animation loop
-    function animate() {
-      requestAnimationFrame(animate);
-      controls.update();
-      TWEEN.update();
-      renderer.render(scene, camera);
-    }
-
+    // Load the model and start the animation loop
+    loadGltfModel();
     animate();
   </script>
 </body>
