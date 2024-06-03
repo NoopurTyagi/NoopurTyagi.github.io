@@ -11,7 +11,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/Tween.min.js"></script>
 </head>
 <body>
-  <h1>Indoor Navigation demorgon</h1>
+  <h1>Indoor Navigation</h1>
 
   <script>
     // Scene setup
@@ -53,7 +53,7 @@
       (gltf) => {
         const model = gltf.scene;
         scene.add(model);
-        console.log('Model loaded successfully');
+        console.log('Model loaded successfully:', model);
 
         // Ensure the model is visible by setting a default position and scale
         model.position.set(0, 0, 0);
