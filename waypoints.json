@@ -1,0 +1,58 @@
+[
+{
+    "id": 1,
+    "name": "Enterance",  // Descriptive name (optional)
+	"x":76.6602765128,
+	"y":30.5161517423,
+	"z":0
+    "connected": [2]  // Waypoints accessible from here (IDs)
+  },{
+    "id": 2,
+    "name": "Corridor Intersection",  // Descriptive name (optional)
+	"x":76.6603059784,
+	"y":30.5161504406
+	"z":0
+    "connected": [1, 3, 4,5,6,7]  // Waypoints accessible from here (IDs)
+  },
+  {
+    "id": 3,
+    "name": "Faculty Room 03",  // Descriptive name (optional)
+    "x":76.66029749,
+	"y":30.51619241,
+	"z":0,
+	"connected": [2]  // Waypoints accessible from here (IDs)
+  },
+  
+  {
+    "id": 4,
+    "name": "Faculty Room 004",  // Descriptive name (optional)
+    "x":76.66032369,
+	"y":30.51611387,
+	"z":0,
+	"connected": [2]  // Waypoints accessible from here (IDs)
+  },
+  {
+    "id": 5,
+    "name": "Restroom 1",  // Descriptive name (optional)
+    "x":76.66032721,
+	"y":30.51619371,
+	"z":0,
+	"connected": [2]  // Waypoints accessible from here (IDs)
+  },
+  {
+    "id": 6,
+    "name": "Restroom 2",  // Descriptive name (optional)
+    "x":76.66034232,
+	"y":30.51619154,
+	"z":0,
+	"connected": [2]  // Waypoints accessible from here (IDs)
+  },
+  {
+    "id": 7,
+    "name": "Pantry",  // Descriptive name (optional)
+    "x":76.66034686,
+	"y":30.51617505,
+	"z":0,
+	"connected": [2]  // Waypoints accessible from here (IDs)
+  }
+]
