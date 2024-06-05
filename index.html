@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-  <h1>GLTF model</h1>
+  <h1>GLTF Viewer</h1>
   <div id="waypoints" style="position: fixed; top: 0; right: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
     <h2>Waypoints</h2>
     <ul id="waypoint-list"></ul>
@@ -163,12 +163,25 @@
         let pathLine = new THREE.Line(pathGeometry, pathMaterial);
         scene.add(pathLine);
         
-        camera.position.set(path[0].x, path[0].y + 1, path[0].z + 2);
-        controls.target.set(path[0].x, path[0].y, path[0].z);
-        controls.update();
+        animateCameraAlongPath(path);
       } else {
         console.log('No path found');
       }
+    }
+
+    function animateCameraAlongPath(path) {
+      let index = 0;
+      function move() {
+        if (index < path.length) {
+          const point = path[index];
+          camera.position.set(point.x, point.y + 1, point.z + 2);
+          controls.target.set(point.x, point.y, point.z);
+          controls.update();
+          index++;
+          setTimeout(move, 500); // Move to next point every 500ms
+        }
+      }
+      move();
     }
 
     function animate() {
@@ -189,3 +202,4 @@
   </script>
 </body>
 </html>
+
