@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-  <h1>3d model </h1>
+  <h1>waypoint3d</h1>
   <div id="waypoints" style="position: fixed; top: 0; right: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
     <h2>Waypoints</h2>
     <ul id="waypoint-list"></ul>
@@ -82,6 +82,8 @@
             controls.update();
           };
           waypointList.appendChild(listItem);
+
+          console.log(`Waypoint added: ${waypoint.name} at (${waypoint.x}, ${waypoint.y}, ${waypoint.z})`);
         });
       } catch (error) {
         console.error('Error loading waypoints:', error);
