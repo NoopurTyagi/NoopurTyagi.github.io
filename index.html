@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-  <h1>chalooo </h1>
+  <h1>haan bhai</h1>
   <div id="waypoints" style="position: fixed; top: 0; right: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
     <h2>Waypoints</h2>
     <ul id="waypoint-list"></ul>
@@ -90,7 +90,7 @@
           markers.push(marker);
 
           const listItem = document.createElement('li');
-          listItem.textContent = waypoint.name;
+          listItem.textContent = waypoint.name; // Display waypoint name
           listItem.style.cursor = 'pointer';
           listItem.onclick = () => {
             selectWaypoint(waypoint.id);
@@ -133,4 +133,3 @@
   </script>
 </body>
 </html>
-
