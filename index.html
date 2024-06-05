@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-  <h1>GLTF Viewer10</h1>
+  <h1>GLTF Viewer</h1>
 
   <script>
     // Three.js scene setup
@@ -41,7 +41,7 @@
 
     // Error handling
     function handleError(error) {
-      console.error("Error loading model:", error);
+      console.error("Error loading model or waypoints:", error);
       alert("Oops! There was an error loading the model or waypoints. Please try again later.");
     }
 
@@ -61,7 +61,7 @@
 
     // Function to fetch and parse waypoint data
     function loadWaypoints() {
-      fetch('https://NoopurTyagi.github.io/waypoints.json')
+      fetch('https://raw.githubusercontent.com/NoopurTyagi/NoopurTyagi.github.io/master/waypoints.json') // Replace with your actual username and repo name
         .then(response => response.json())
         .then(data => {
           const waypoints = data;
@@ -81,9 +81,8 @@
 
         const markerMesh = new THREE.Mesh(markerGeometry, markerMaterial);
         markerMesh.position.set(waypoint.x, waypoint.y, waypoint.z);
+        markerMesh.userData = { waypointId: waypoint.id }; // Add waypoint ID for potential interaction
 
         // Add label or icon (optional)
         const labelDiv = document.createElement('div');
-        labelDiv.textContent = waypoint.name; // Assuming 'name' property exists in waypoints
-        labelDiv.style.position = 'absolute';
-        labelDiv.
+        labelDiv.textContent = waypoint.name; 
