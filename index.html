@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-  <h1>waypoint3d</h1>
+  <h1>GLTF Viewer</h1>
   <div id="waypoints" style="position: fixed; top: 0; right: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
     <h2>Waypoints</h2>
     <ul id="waypoint-list"></ul>
@@ -36,6 +36,9 @@
     directionalLight.position.set(5, 10, 7.5).normalize();
     scene.add(directionalLight);
 
+    let waypoints = [];
+    let waypointMap = {};
+
     function handleError(error) {
       console.error("Error loading model:", error);
       alert("Oops! There was an error loading the model. Please try again later.");
@@ -60,12 +63,14 @@
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        const waypoints = await response.json();
+        waypoints = await response.json();
         console.log('Waypoints loaded successfully', waypoints);
 
         const waypointList = document.getElementById('waypoint-list');
 
         waypoints.forEach(waypoint => {
+          waypointMap[waypoint.id] = waypoint;
+
           const markerGeometry = new THREE.SphereGeometry(0.1, 32, 32);
           const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
           const marker = new THREE.Mesh(markerGeometry, markerMaterial);
@@ -77,9 +82,7 @@
           listItem.textContent = waypoint.name;
           listItem.style.cursor = 'pointer';
           listItem.onclick = () => {
-            camera.position.set(waypoint.x, waypoint.y + 1, waypoint.z + 2);
-            controls.target.set(waypoint.x, waypoint.y, waypoint.z);
-            controls.update();
+            navigateToWaypoint(waypoint.id);
           };
           waypointList.appendChild(listItem);
 
@@ -87,6 +90,84 @@
         });
       } catch (error) {
         console.error('Error loading waypoints:', error);
+      }
+    }
+
+    function heuristic(a, b) {
+      return Math.sqrt(
+        Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2)
+      );
+    }
+
+    function aStar(start, goal) {
+      let openSet = [start];
+      let cameFrom = {};
+      let gScore = {};
+      let fScore = {};
+      
+      waypoints.forEach(waypoint => {
+        gScore[waypoint.id] = Infinity;
+        fScore[waypoint.id] = Infinity;
+      });
+
+      gScore[start.id] = 0;
+      fScore[start.id] = heuristic(start, goal);
+
+      while (openSet.length > 0) {
+        openSet.sort((a, b) => fScore[a.id] - fScore[b.id]);
+        let current = openSet.shift();
+
+        if (current.id === goal.id) {
+          let path = [];
+          while (current) {
+            path.unshift(current);
+            current = cameFrom[current.id];
+          }
+          return path;
+        }
+
+        current.connected.forEach(neighborId => {
+          let neighbor = waypointMap[neighborId];
+          let tentative_gScore = gScore[current.id] + heuristic(current, neighbor);
+
+          if (tentative_gScore < gScore[neighbor.id]) {
+            cameFrom[neighbor.id] = current;
+            gScore[neighbor.id] = tentative_gScore;
+            fScore[neighbor.id] = gScore[neighbor.id] + heuristic(neighbor, goal);
+            if (!openSet.includes(neighbor)) {
+              openSet.push(neighbor);
+            }
+          }
+        });
+      }
+
+      return [];
+    }
+
+    function navigateToWaypoint(goalId) {
+      let start = waypointMap[1]; // Assuming starting from waypoint 1
+      let goal = waypointMap[goalId];
+      let path = aStar(start, goal);
+
+      if (path.length > 0) {
+        console.log('Path found:', path);
+
+        let pathGeometry = new THREE.BufferGeometry();
+        let vertices = [];
+        path.forEach(point => {
+          vertices.push(point.x, point.y, point.z);
+        });
+        pathGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+        let pathMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+        let pathLine = new THREE.Line(pathGeometry, pathMaterial);
+        scene.add(pathLine);
+        
+        camera.position.set(path[0].x, path[0].y + 1, path[0].z + 2);
+        controls.target.set(path[0].x, path[0].y, path[0].z);
+        controls.update();
+      } else {
+        console.log('No path found');
       }
     }
 
