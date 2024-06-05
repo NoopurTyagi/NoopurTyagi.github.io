@@ -92,7 +92,7 @@
           listItem.textContent = waypoint.name;
           listItem.style.cursor = 'pointer';
           listItem.onclick = () => {
-            navigateToWaypoint(waypoint.id);
+            selectWaypoint(waypoint.id);
           };
           waypointList.appendChild(listItem);
 
@@ -103,105 +103,22 @@
       }
     }
 
-    function heuristic(a, b) {
-      return Math.sqrt(
-        Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2)
-      );
-    }
-
-    function aStar(start, goal) {
-      let openSet = [start];
-      let cameFrom = {};
-      let gScore = {};
-      let fScore = {};
-
-      waypoints.forEach(waypoint => {
-        gScore[waypoint.id] = Infinity;
-        fScore[waypoint.id] = Infinity;
-      });
-
-      gScore[start.id] = 0;
-      fScore[start.id] = heuristic(start, goal);
-
-      while (openSet.length > 0) {
-        openSet.sort((a, b) => fScore[a.id] - fScore[b.id]);
-        let current = openSet.shift();
-
-        if (current.id === goal.id) {
-          let path = [];
-          while (current) {
-            path.unshift(current);
-            current = cameFrom[current.id];
-          }
-          return path;
-        }
-
-        current.connected.forEach(neighborId => {
-          let neighbor = waypointMap[neighborId];
-          let tentative_gScore = gScore[current.id] + heuristic(current, neighbor);
-
-          if (tentative_gScore < gScore[neighbor.id]) {
-            cameFrom[neighbor.id] = current;
-            gScore[neighbor.id] = tentative_gScore;
-            fScore[neighbor.id] = gScore[neighbor.id] + heuristic(neighbor, goal);
-            if (!openSet.includes(neighbor)) {
-              openSet.push(neighbor);
-            }
-          }
-        });
-      }
-
-      return [];
-    }
-
-    function navigateToWaypoint(goalId) {
+    function selectWaypoint(waypointId) {
+      const waypoint = waypointMap[waypointId];
       if (!startWaypoint) {
-        startWaypoint = waypointMap[goalId];
-        alert(`Start waypoint selected: ${startWaypoint.name}`);
-      } else {
-        endWaypoint = waypointMap[goalId];
-        alert(`End waypoint selected: ${endWaypoint.name}`);
-        let path = aStar(startWaypoint, endWaypoint);
-
-        if (path.length > 0) {
-          console.log('Path found:', path);
-
-          let pathGeometry = new THREE.BufferGeometry();
-          let vertices = [];
-          path.forEach(point => {
-            vertices.push(point.x, point.y, point.z);
-          });
-          pathGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-
-          let pathMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
-          let pathLine = new THREE.Line(pathGeometry, pathMaterial);
-          scene.add(pathLine);
-
-          animateCameraAlongPath(path);
-
-          startWaypoint = null;
-          endWaypoint = null;
-        } else {
-          alert('No path found');
-          startWaypoint = null;
-          endWaypoint = null;
-        }
+        startWaypoint = waypoint;
+        document.getElementById('start-waypoint').textContent = waypoint.name;
+      } else if (!endWaypoint) {
+        endWaypoint = waypoint;
+        document.getElementById('end-waypoint').textContent = waypoint.name;
+        navigateToWaypoints(startWaypoint, endWaypoint);
       }
     }
 
-    function animateCameraAlongPath(path) {
-      let index = 0;
-      function move() {
-        if (index < path.length) {
-          const point = path[index];
-          camera.position.set(point.x, point.y + 1, point.z + 2);
-          controls.target.set(point.x, point.y, point.z);
-          controls.update();
-          index++;
-          setTimeout(move, 500); // Move to next point every 500ms
-        }
-      }
-      move();
+    function navigateToWaypoints(start, end) {
+      // Implement navigation logic here
+      console.log(`Navigating from ${start.name} to ${end.name}`);
+      // Example: Call your pathfinding function and animate camera
     }
 
     function animate() {
@@ -225,21 +142,5 @@
 
       if (intersects.length > 0) {
         const waypointId = intersects[0].object.userData.id;
-        navigateToWaypoint(waypointId);
-      }
-    }
+        selectWaypoint(waypointId);
 
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-    document.addEventListener('mousedown', onDocumentMouseDown, false);
-
-    loadGltfModel();
-    loadWaypoints();
-    animate();
-  </script>
-</body>
-</html>
