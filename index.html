@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-  <h1>GLTF Viewer12</h1>
+  <h1>GLTF Viewer</h1>
   <div id="waypoints" style="position: fixed; top: 0; right: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
     <h2>Waypoints</h2>
     <ul id="waypoint-list"></ul>
@@ -56,7 +56,7 @@
 
     async function loadWaypoints() {
       try {
-        const response = await fetch( 'https://NoopurTyagi.github.io/waypoints.json');
+        const response = await fetch('https://YourGithubUserName.github.io/path/to/waypoints.json');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
