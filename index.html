@@ -38,6 +38,9 @@
 
     let waypoints = [];
     let waypointMap = {};
+    let markers = [];
+    let startWaypoint = null;
+    let endWaypoint = null;
 
     function handleError(error) {
       console.error("Error loading model:", error);
@@ -76,7 +79,9 @@
           const marker = new THREE.Mesh(markerGeometry, markerMaterial);
           marker.position.set(waypoint.x, waypoint.y, waypoint.z);
           marker.name = waypoint.name;
+          marker.userData.id = waypoint.id;
           scene.add(marker);
+          markers.push(marker);
 
           const listItem = document.createElement('li');
           listItem.textContent = waypoint.name;
@@ -104,7 +109,7 @@
       let cameFrom = {};
       let gScore = {};
       let fScore = {};
-      
+
       waypoints.forEach(waypoint => {
         gScore[waypoint.id] = Infinity;
         fScore[waypoint.id] = Infinity;
@@ -145,27 +150,37 @@
     }
 
     function navigateToWaypoint(goalId) {
-      let start = waypointMap[1]; // Assuming starting from waypoint 1
-      let goal = waypointMap[goalId];
-      let path = aStar(start, goal);
-
-      if (path.length > 0) {
-        console.log('Path found:', path);
-
-        let pathGeometry = new THREE.BufferGeometry();
-        let vertices = [];
-        path.forEach(point => {
-          vertices.push(point.x, point.y, point.z);
-        });
-        pathGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-
-        let pathMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
-        let pathLine = new THREE.Line(pathGeometry, pathMaterial);
-        scene.add(pathLine);
-        
-        animateCameraAlongPath(path);
+      if (!startWaypoint) {
+        startWaypoint = waypointMap[goalId];
+        alert(`Start waypoint selected: ${startWaypoint.name}`);
       } else {
-        console.log('No path found');
+        endWaypoint = waypointMap[goalId];
+        alert(`End waypoint selected: ${endWaypoint.name}`);
+        let path = aStar(startWaypoint, endWaypoint);
+
+        if (path.length > 0) {
+          console.log('Path found:', path);
+
+          let pathGeometry = new THREE.BufferGeometry();
+          let vertices = [];
+          path.forEach(point => {
+            vertices.push(point.x, point.y, point.z);
+          });
+          pathGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+          let pathMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+          let pathLine = new THREE.Line(pathGeometry, pathMaterial);
+          scene.add(pathLine);
+
+          animateCameraAlongPath(path);
+
+          startWaypoint = null;
+          endWaypoint = null;
+        } else {
+          alert('No path found');
+          startWaypoint = null;
+          endWaypoint = null;
+        }
       }
     }
 
@@ -190,11 +205,32 @@
       renderer.render(scene, camera);
     }
 
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    function onDocumentMouseDown(event) {
+      event.preventDefault();
+
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+
+      const intersects = raycaster.intersectObjects(markers);
+
+      if (intersects.length > 0) {
+        const waypointId = intersects[0].object.userData.id;
+        navigateToWaypoint(waypointId);
+      }
+    }
+
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
+
+    document.addEventListener('mousedown', onDocumentMouseDown, false);
 
     loadGltfModel();
     loadWaypoints();
@@ -202,4 +238,3 @@
   </script>
 </body>
 </html>
-
