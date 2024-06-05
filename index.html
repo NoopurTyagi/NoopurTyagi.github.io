@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-  <h1>GLTF Viewer</h1>
+  <h1>GLTF Viewer12</h1>
   <div id="waypoints" style="position: fixed; top: 0; right: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
     <h2>Waypoints</h2>
     <ul id="waypoint-list"></ul>
@@ -55,29 +55,37 @@
     }
 
     async function loadWaypoints() {
-      const response = await fetch('https://NoopurTyagi.github.io/waypoints.json');
-      const waypoints = await response.json();
+      try {
+        const response = await fetch( 'https://NoopurTyagi.github.io/waypoints.json');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const waypoints = await response.json();
+        console.log('Waypoints loaded successfully', waypoints);
 
-      const waypointList = document.getElementById('waypoint-list');
+        const waypointList = document.getElementById('waypoint-list');
 
-      waypoints.forEach(waypoint => {
-        const markerGeometry = new THREE.SphereGeometry(0.1, 32, 32);
-        const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        const marker = new THREE.Mesh(markerGeometry, markerMaterial);
-        marker.position.set(waypoint.x, waypoint.y, waypoint.z);
-        marker.name = waypoint.name;
-        scene.add(marker);
+        waypoints.forEach(waypoint => {
+          const markerGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+          const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+          const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+          marker.position.set(waypoint.x, waypoint.y, waypoint.z);
+          marker.name = waypoint.name;
+          scene.add(marker);
 
-        const listItem = document.createElement('li');
-        listItem.textContent = waypoint.name;
-        listItem.style.cursor = 'pointer';
-        listItem.onclick = () => {
-          camera.position.set(waypoint.x, waypoint.y + 1, waypoint.z + 2);
-          controls.target.set(waypoint.x, waypoint.y, waypoint.z);
-          controls.update();
-        };
-        waypointList.appendChild(listItem);
-      });
+          const listItem = document.createElement('li');
+          listItem.textContent = waypoint.name;
+          listItem.style.cursor = 'pointer';
+          listItem.onclick = () => {
+            camera.position.set(waypoint.x, waypoint.y + 1, waypoint.z + 2);
+            controls.target.set(waypoint.x, waypoint.y, waypoint.z);
+            controls.update();
+          };
+          waypointList.appendChild(listItem);
+        });
+      } catch (error) {
+        console.error('Error loading waypoints:', error);
+      }
     }
 
     function animate() {
@@ -98,4 +106,3 @@
   </script>
 </body>
 </html>
-
