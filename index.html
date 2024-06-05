@@ -131,29 +131,28 @@
     animate(); // Start animation loop
     loadGltfModel(); // Load GLTF model
 
-    // Add event listener for mouse clicks
-    document.addEventListener('mousedown', onDocumentMouseDown);
+    // Option 1: Hardcode the Values
+    const startWaypointId = 1; // Example ID for the start waypoint
+    const endWaypointId = 3;   // Example ID for the end waypoint
 
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
+    // Call the selectWaypoint function with the hardcoded IDs
+    selectWaypoint(startWaypointId);
+    selectWaypoint(endWaypointId);
 
-    function onDocumentMouseDown(event) {
-      event.preventDefault();
+    // Option 2: Allow User Interaction
+    function selectStartWaypoint() {
+      const waypointId = prompt("Enter the ID of the start waypoint:");
+      if (waypointId) {
+        selectWaypoint(parseInt(waypointId));
+      }
+    }
 
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-      raycaster.setFromCamera(mouse, camera);
-
-      const intersects = raycaster.intersectObjects(markers);
-
-      if (intersects.length > 0) {
-        const waypointId = intersects[0].object.userData.id;
-        selectWaypoint(waypointId);
+    function selectEndWaypoint() {
+      const waypointId = prompt("Enter the ID of the end waypoint:");
+      if (waypointId) {
+        selectWaypoint(parseInt(waypointId));
       }
     }
   </script>
 </body>
 </html>
-
-
