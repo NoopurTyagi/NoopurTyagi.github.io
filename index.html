@@ -59,7 +59,7 @@
 
     async function loadWaypoints() {
       try {
-        const response = await fetch('https://NoopurTyagi.github.io/waypoints.json');
+        const response = await fetch('https://raw.githubusercontent.com/NoopurTyagi/NoopurTyagi.github.io/main/waypoints.json');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
