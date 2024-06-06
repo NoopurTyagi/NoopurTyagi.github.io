@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-  <h1>3D Model </h1>
+  <h1>3D Model for Navigation</h1>
   <div id="waypoints" style="position: fixed; top: 0; right: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
     <h2>Waypoints</h2>
     <ul id="waypoint-list"></ul>
@@ -24,12 +24,12 @@
     // Define the waypoints with latitude and longitude coordinates
     const waypoints = [
       { "id": 1, "name": "Entrance", "x": 8533783.04, "y": 3570068.89, "z": 0, "connected": [2] },
-      { "id": 2, "name": "Corridor Intersection", "x": 8533778.08, "y": 3570072.92, "z": 0, "connected": [1, 3, 4, 5, 6, 7] },
-      { "id": 3, "name": "Faculty Room 03", "x": 8533785.42, "y": 3570076.64, "z": 0, "connected": [2] },
-      { "id": 4, "name": "Faculty Room 004", "x": 8533781.07, "y": 3570067.79, "z": 0, "connected": [2] },
-      { "id": 5, "name": "Restroom 1", "x": 8533789.76, "y": 3570072.92, "z": 0, "connected": [2] },
-      { "id": 6, "name": "Restroom 2", "x": 8533792.28, "y": 3570072.87, "z": 0, "connected": [2] },
-      { "id": 7, "name": "Pantry", "x": 8533784.23, "y": 3570069.28, "z": 0, "connected": [2] }
+      { "id": 2, "name": "Corridor Intersection", "x": 8533783.08, "y": 3570068.92, "z": 0, "connected": [1, 3, 4, 5, 6, 7] },
+      { "id": 3, "name": "Faculty Room 03", "x": 8533783.42, "y": 3570074.64, "z": 0, "connected": [2] },
+      { "id": 4, "name": "Faculty Room 004", "x": 8533783.07, "y": 3570068.79, "z": 0, "connected": [2] },
+      { "id": 5, "name": "Restroom 1", "x": 8533788.76, "y": 3570075.92, "z": 0, "connected": [2] },
+      { "id": 6, "name": "Restroom 2", "x": 8533790.28, "y": 3570075.87, "z": 0, "connected": [2] },
+      { "id": 7, "name": "Pantry", "x": 8533783.23, "y": 3570071.28, "z": 0, "connected": [2] }
     ];
 
     // Initialize the Three.js scene
@@ -61,7 +61,7 @@
     let line = null;
 
     // Scaling factor for latitude and longitude to fit into the 3D space
-    const scaleFactor = 0.00005; // Adjust this factor based on your GLTF model's scale
+    const scaleFactor = 0.0001; // Adjust this factor based on your GLTF model's scale
 
     // Function to handle errors
     function handleError(error) {
@@ -100,10 +100,6 @@
         scene.add(marker); // Add the marker to the scene
         markers.push(marker);
 
-        // Create a label for the waypoint
-        const label = createLabel(waypoint.name, marker.position.x, marker.position.y, marker.position.z);
-        scene.add(label);
-
         const listItem = document.createElement('li');
         listItem.textContent = waypoint.name; // Display waypoint name
         listItem.style.cursor = 'pointer';
@@ -114,22 +110,6 @@
 
         console.log(`Waypoint added: ${waypoint.name} at (${marker.position.x}, ${marker.position.y}, ${marker.position.z})`);
       });
-    }
-
-    // Function to create a label
-    function createLabel(text, x, y, z) {
-      const labelDiv = document.createElement('div');
-      labelDiv.textContent = text;
-      labelDiv.style.position = 'absolute';
-      labelDiv.style.color = 'white';
-      labelDiv.style.top = '0px';
-      labelDiv.style.left = '0px';
-      document.body.appendChild(labelDiv);
-
-      const labelObject = new THREE.CSS2DObject(labelDiv);
-      labelObject.position.set(x, y, z);
-
-      return labelObject;
     }
 
     // Function to handle waypoint selection
