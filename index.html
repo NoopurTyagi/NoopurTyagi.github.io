@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-  <h1>3D model for navigation hhhjh</h1>
+  <h1>3D model demorgon</h1>
   <div id="waypoints" style="position: fixed; top: 0; right: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
     <h2>Waypoints</h2>
     <ul id="waypoint-list"></ul>
@@ -22,13 +22,13 @@
 
   <script>
   const waypoints = [
-      { "id": 1, "name": "Entrance", "x": 76.6602765128, "y": 30.5161517423, "z": 0, "connected": [2] },
-      { "id": 2, "name": "Corridor Intersection", "x": 1, "y": 0, "z": 0, "connected": [1, 3, 4, 5, 6, 7] },
-      { "id": 3, "name": "Faculty Room 03", "x": 1, "y": 1, "z": 0, "connected": [2] },
-      { "id": 4, "name": "Faculty Room 004", "x": 1, "y": -1, "z": 0, "connected": [2] },
-      { "id": 5, "name": "Restroom 1", "x": 2, "y": 0, "z": 0, "connected": [2] },
-      { "id": 6, "name": "Restroom 2", "x": 2, "y": 1, "z": 0, "connected": [2] },
-      { "id": 7, "name": "Pantry", "x": 2, "y": -1, "z": 0, "connected": [2] }
+      { "id": 1, "name": "Entrance", "x": 8533783.04, "y": 3570068.89, "z": 0, "connected": [2] },
+      { "id": 2, "name": "Corridor Intersection", "x": 8533783.08, "y": 3570068.92, "z": 0, "connected": [1, 3, 4, 5, 6, 7] },
+      { "id": 3, "name": "Faculty Room 03", "x": 8533783.42, "y": 3570074.64, "z": 0, "connected": [2] },
+      { "id": 4, "name": "Faculty Room 004", "x": 8533783.07, "y": 3570068.79, "z": 0, "connected": [2] },
+      { "id": 5, "name": "Restroom 1", "x": 8533788.76, "y": 3570075.92, "z": 0, "connected": [2] },
+      { "id": 6, "name": "Restroom 2", "x": 8533790.28, "y": 3570075.87, "z": 0, "connected": [2] },
+      { "id": 7, "name": "Pantry", "x": 8533783.23, "y": 3570071.28, "z": 0, "connected": [2] }
     ];
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
