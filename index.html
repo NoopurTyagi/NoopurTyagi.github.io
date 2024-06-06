@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-  <h1> hanji </h1>
+  <h1>ho jayega </h1>
   <div id="waypoints" style="position: fixed; top: 0; right: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
     <h2>Waypoints</h2>
     <ul id="waypoint-list"></ul>
@@ -82,7 +82,7 @@
       waypoints.forEach(waypoint => {
         waypointMap[waypoint.id] = waypoint;
 
-        const markerGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+        const markerGeometry = new THREE.SphereGeometry(0.2, 32, 32); // Increased the size of the waypoints
         const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
         const marker = new THREE.Mesh(markerGeometry, markerMaterial);
         marker.position.set(waypoint.x - 76.6602765128, 0, waypoint.y - 30.5161517423);
@@ -122,7 +122,7 @@
       const startVector = new THREE.Vector3(start.x - 76.6602765128, 0, start.y - 30.5161517423);
       const endVector = new THREE.Vector3(end.x - 76.6602765128, 0, end.y - 30.5161517423);
       const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
-      let points = [];
+      const points = [];
       points.push(startVector);
       points.push(endVector);
       const geometry = new THREE.BufferGeometry().setFromPoints(points);
