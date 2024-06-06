@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-  <h1>3D Model hhh</h1>
+  <h1>3D Model for Navigation</h1>
   <div id="waypoints" style="position: fixed; top: 0; right: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
     <h2>Waypoints</h2>
     <ul id="waypoint-list"></ul>
@@ -22,13 +22,62 @@
 
   <script>
     const waypoints = [
-      { "id": 1, "name": "Entrance", "x": 76.6602765128, "y": 30.5161517423, "z": 0, "connected": [2] },
-      { "id": 2, "name": "Corridor Intersection", "x": 76.6603059784, "y": 30.5161504406, "z": 0, "connected": [1, 3, 4, 5, 6, 7] },
-      { "id": 3, "name": "Faculty Room 03", "x": 76.66029749, "y": 30.51619241, "z": 0, "connected": [2] },
-      { "id": 4, "name": "Faculty Room 004", "x": 76.66032369, "y": 30.51611387, "z": 0, "connected": [2] },
-      { "id": 5, "name": "Restroom 1", "x": 76.66032721, "y": 30.51619371, "z": 0, "connected": [2] },
-      { "id": 6, "name": "Restroom 2", "x": 76.66034232, "y": 30.51619154, "z": 0, "connected": [2] },
-      { "id": 7, "name": "Pantry", "x": 76.66034686, "y": 30.51617505, "z": 0, "connected": [2] }
+      {
+        "id": 1,
+        "name": "Entrance",
+        "x": 76.6602765128,
+        "y": 30.5161517423,
+        "z": 0,
+        "connected": [2]
+      },
+      {
+        "id": 2,
+        "name": "Corridor Intersection",
+        "x": 76.6603059784,
+        "y": 30.5161504406,
+        "z": 0,
+        "connected": [1, 3, 4, 5, 6, 7]
+      },
+      {
+        "id": 3,
+        "name": "Faculty Room 03",
+        "x": 76.66029749,
+        "y": 30.51619241,
+        "z": 0,
+        "connected": [2]
+      },
+      {
+        "id": 4,
+        "name": "Faculty Room 004",
+        "x": 76.66032369,
+        "y": 30.51611387,
+        "z": 0,
+        "connected": [2]
+      },
+      {
+        "id": 5,
+        "name": "Restroom 1",
+        "x": 76.66032721,
+        "y": 30.51619371,
+        "z": 0,
+        "connected": [2]
+      },
+      {
+        "id": 6,
+        "name": "Restroom 2",
+        "x": 76.66034232,
+        "y": 30.51619154,
+        "z": 0,
+        "connected": [2]
+      },
+      {
+        "id": 7,
+        "name": "Pantry",
+        "x": 76.66034686,
+        "y": 30.51617505,
+        "z": 0,
+        "connected": [2]
+      }
     ];
 
     const scene = new THREE.Scene();
@@ -55,7 +104,6 @@
     let markers = [];
     let startWaypoint = null;
     let endWaypoint = null;
-    let line = null;
 
     function handleError(error) {
       console.error("Error loading model:", error);
@@ -64,90 +112,71 @@
 
     function loadGltfModel() {
       const loader = new THREE.GLTFLoader();
-      loader.load('https://NoopurTyagi.github.io/mymodel4.gltf', (gltf) => {
-        scene.add(gltf.scene);
-        createWaypoints();
-      }, undefined, handleError);
+      loader.load(
+        'https://NoopurTyagi.github.io/mymodel4.gltf',
+        (gltf) => {
+          scene.add(gltf.scene);
+          console.log('Model loaded successfully');
+          loadWaypoints(); // Load waypoints after model is loaded
+        },
+        undefined,
+        handleError
+      );
     }
 
-    function createWaypoints() {
-      waypoints.forEach((waypoint) => {
-        const marker = new THREE.Mesh(new THREE.SphereGeometry(0.1, 32, 32), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+    function loadWaypoints() {
+      const waypointList = document.getElementById('waypoint-list');
+
+      waypoints.forEach(waypoint => {
+        waypointMap[waypoint.id] = waypoint;
+
+        const markerGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+        const markerMaterial = new THREE.MeshBasicMaterial({ color: waypoint.id === 1 ? 0x00ff00 : 0xff0000 });
+        const marker = new THREE.Mesh(markerGeometry, markerMaterial);
         marker.position.set(waypoint.x, waypoint.y, waypoint.z);
+        marker.name = waypoint.name;
+        marker.userData.id = waypoint.id;
         scene.add(marker);
         markers.push(marker);
-        waypointMap[waypoint.id] = marker;
-      });
-      createWaypointList();
-    }
 
-    function createWaypointList() {
-      const waypointList = document.getElementById('waypoint-list');
-      waypoints.forEach((waypoint) => {
         const listItem = document.createElement('li');
-        listItem.textContent = waypoint.name;
-        listItem.addEventListener('click', () => {
-          selectWaypoint(waypoint);
-        });
+        listItem.textContent = waypoint.name; // Display waypoint name
+        listItem.style.cursor = 'pointer';
+        listItem.onclick = () => {
+          selectWaypoint(waypoint.id);
+        };
         waypointList.appendChild(listItem);
+
+        console.log(`Waypoint added: ${waypoint.name} at (${waypoint.x}, ${waypoint.y}, ${waypoint.z})`);
       });
     }
 
-    function selectWaypoint(waypoint) {
-      if (startWaypoint === null) {
+    function selectWaypoint(waypointId) {
+      const waypoint = waypointMap[waypointId];
+      if (!startWaypoint) {
         startWaypoint = waypoint;
         document.getElementById('start-waypoint').textContent = waypoint.name;
-      } else if (endWaypoint === null) {
+      } else if (!endWaypoint) {
         endWaypoint = waypoint;
         document.getElementById('end-waypoint').textContent = waypoint.name;
-        navigateToWaypoints();
+        navigateToWaypoints(startWaypoint, endWaypoint);
       }
     }
 
-    function navigateToWaypoints() {
-      if (startWaypoint!== null && endWaypoint!== null) {
-        const startMarker = waypointMap[startWaypoint.id];
-        const endMarker = waypointMap[endWaypoint.id];
-        const waypointsToVisit = findShortestPath(startWaypoint, endWaypoint);
-        animateNavigation(waypointsToVisit, startMarker, endMarker);
-      }
+    function navigateToWaypoints(start, end) {
+      // Implement navigation logic here
+      console.log(`Navigating from ${start.name} to ${end.name}`);
+      // Example: Call your pathfinding function and animate camera
     }
 
-    function findShortestPath(startWaypoint, endWaypoint) {
-      const visited = {};
-      const queue = [{ waypoint: startWaypoint, path: [startWaypoint] }];
-      while (queue.length > 0) {
-        const { waypoint, path } = queue.shift();
-        if (waypoint.id === endWaypoint.id) {
-          return path;
-        }
-        if (!visited[waypoint.id]) {
-          visited[waypoint.id] = true;
-          waypoint.connected.forEach((connectedWaypointId) => {
-            const connectedWaypoint = waypoints.find((waypoint) => waypoint.id === connectedWaypointId);
-            queue.push({ waypoint: connectedWaypoint, path: [...path, connectedWaypoint] });
-          });
-        }
-      }
-      return null;
-    }
-
-    function animateNavigation(waypointsToVisit, startMarker, endMarker) {
-      const navigationLine = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0x0000ff }));
-      scene.add(navigationLine);
-      line = navigationLine;
-      const positions = [];
-      waypointsToVisit.forEach((waypoint) => {
-        positions.push(waypoint.x, waypoint.y, waypoint.z);
-      });
-      navigationLine.geometry.setFromPoints(positions);
-      camera.position.set(startMarker.position.x, startMarker.position.y, startMarker.position.z);
-      controls.target.set(endMarker.position.x, endMarker.position.y, endMarker.position.z);
+    function animate() {
+      requestAnimationFrame(animate);
       controls.update();
       renderer.render(scene, camera);
     }
 
-    loadGltfModel();
+    animate(); // Start animation loop
+    loadGltfModel(); // Load GLTF model
   </script>
 </body>
 </html>
