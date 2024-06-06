@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-  <h1>3D Model for Navigation</h1>
+  <h1> kuch bhi </h1>
   <div id="waypoints" style="position: fixed; top: 0; right: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
     <h2>Waypoints</h2>
     <ul id="waypoint-list"></ul>
@@ -104,6 +104,7 @@
     let markers = [];
     let startWaypoint = null;
     let endWaypoint = null;
+let line = null;
 
     function handleError(error) {
       console.error("Error loading model:", error);
@@ -131,7 +132,7 @@
         waypointMap[waypoint.id] = waypoint;
 
         const markerGeometry = new THREE.SphereGeometry(0.1, 32, 32);
-        const markerMaterial = new THREE.MeshBasicMaterial({ color: waypoint.id === 1 ? 0x00ff00 : 0xff0000 });
+        const markerMaterial = new THREE.MeshBasicMaterial({ color: waypoint.id === 1? 0x00ff00 : 0xff0000 });
         const marker = new THREE.Mesh(markerGeometry, markerMaterial);
         marker.position.set(waypoint.x, waypoint.y, waypoint.z);
         marker.name = waypoint.name;
@@ -164,9 +165,21 @@
     }
 
     function navigateToWaypoints(start, end) {
-      // Implement navigation logic here
+      if (line) {
+        scene.remove(line);
+      }
+
+      const lineGeometry = new THREE.BufferGeometry();
+      const lineMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff });
+      const linePoints = [
+        new THREE.Vector3(start.x, start.y, start.z),
+        new THREE.Vector3(end.x, end.y, end.z)
+      ];
+      lineGeometry.setFromPoints(linePoints);
+      line = new THREE.Line(lineGeometry, lineMaterial);
+      scene.add(line);
+
       console.log(`Navigating from ${start.name} to ${end.name}`);
-      // Example: Call your pathfinding function and animate camera
     }
 
     function animate() {
