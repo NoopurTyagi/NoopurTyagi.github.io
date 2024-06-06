@@ -85,7 +85,7 @@
         const markerGeometry = new THREE.SphereGeometry(0.1, 32, 32);
         const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Default color is red
         const marker = new THREE.Mesh(markerGeometry, markerMaterial);
-        marker.position.set(waypoint.x, waypoint.y, waypoint.z); // Set the position of the marker
+        marker.position.set(waypoint.x - 76.6602765128, 0, waypoint.y - 30.5161517423); // Adjust the position of the marker
         marker.name = waypoint.name;
         marker.userData.id = waypoint.id;
         scene.add(marker); // Add the marker to the scene
@@ -119,10 +119,10 @@
       if (line) {
         scene.remove(line);
       }
-      const startVector = new THREE.Vector3(start.x, start.y, start.z);
-      const endVector = new THREE.Vector3(end.x, end.y, end.z);
+      const startVector = new THREE.Vector3(start.x - 76.6602765128, 0, start.y - 30.5161517423);
+      const endVector = new THREE.Vector3(end.x - 76.6602765128, 0, end.y - 30.5161517423);
       const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
-            let points = [];
+      let points = [];
       points.push(startVector);
       points.push(endVector);
       const geometry = new THREE.BufferGeometry().setFromPoints(points);
@@ -141,4 +141,3 @@
   </script>
 </body>
 </html>
-
