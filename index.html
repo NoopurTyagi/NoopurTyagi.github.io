@@ -64,7 +64,7 @@
 
     function loadGltfModel() {
       const loader = new THREE.GLTFLoader();
-      loader.load('model.gltf', (gltf) => {
+      loader.load('https://NoopurTyagi.github.io/mymodel4.gltf', (gltf) => {
         scene.add(gltf.scene);
         createWaypoints();
       }, undefined, handleError);
