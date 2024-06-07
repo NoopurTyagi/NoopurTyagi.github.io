@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-  <h1>3D demorgon model nav </h1>
+  <h1>3D demorgon model  </h1>
   <div id="waypoints" style="position: fixed; top: 0; right: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
     <h2>Waypoints</h2>
     <ul id="waypoint-list"></ul>
@@ -22,6 +22,7 @@
 
   <script>
     // Define the waypoints with adjusted coordinates
+    const scaleFactor = 0.01;
     const waypoints = [
       { "id": 1, "name": "Entrance", "x": -8, "y": 0, "z": -3, "connected": [2] },
       { "id": 2, "name": "Corridor Intersection", "x": -6, "y": 0, "z": -3, "connected": [1, 3, 4, 5, 6, 7] },
@@ -123,43 +124,30 @@
       }
     }
 
- 
-function navigateToWaypoints(start, end) {
-  if (line) {
-    scene.remove(line);
-  }
-  const startVector = new THREE.Vector3(start.x, start.y, start.z);
-  const endVector = new THREE.Vector3(end.x, end.y, end.z);
+    // Function to draw a line between start and end waypoints
+    function navigateToWaypoints(start, end) {
+      if (line) {
+        scene.remove(line);
+      }
+      const startVector = new THREE.Vector3(start.x, start.y, start.z);
+      const endVector = new THREE.Vector3(end.x, end.y, end.z);
 
-  const geometry = new THREE.BufferGeometry().setFromPoints([startVector, endVector]);
-  const material = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 50 }); // Green and thick line
-  line = new THREE.Line(geometry, material);
-  scene.add(line);
+      const geometry = new THREE.BufferGeometry().setFromPoints([startVector, endVector]);
+      const material = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 50 }); // Green and thick line
+      line = new THREE.Line(geometry, material);
+      scene.add(line);
+    }
 
-  // Implement pathfinding algorithm here
-  const path = findPath(start, end);
-  console.log("Path:", path);
+    // Start the animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
 
-  // Animate camera along the path
-  animateCameraAlongPath(path);
-}
-
-// Function to animate the camera along the path
-function animateCameraAlongPath(path) {
-  const duration = 2000; // Animation duration in milliseconds
-  const cameraStartPosition = camera.position.clone(); // Save camera's initial position
-  const tween = new TWEEN.Tween({ t: 0 })
-    .to({ t: 1 }, duration)
-    .onUpdate(function () {
-      const t = this.t;
-      const index = Math.floor(t * (path.length - 1));
-      const waypoint = path[index];
-      const targetPosition = new THREE.Vector3(waypoint.x, waypoint.y, waypoint.z);
-      const newPosition = cameraStartPosition.clone().lerp(targetPosition, t);
-      camera.position.copy(newPosition);
-      camera.lookAt(targetPosition);
-    })
-    .start();
-}
-
-       
+    // Load the GLTF model and start the animation loop
+    loadGltfModel();
+    animate();
+  </script>
+</body>
+</html>
