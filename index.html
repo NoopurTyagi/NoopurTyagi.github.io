@@ -7,9 +7,10 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/Tween.min.js"></script>
 </head>
 <body>
-  <h1>3D </h1>
+  <h1>3D Demorgon Model for Navigation</h1>
   <div id="waypoints" style="position: fixed; top: 0; right: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
     <h2>Waypoints</h2>
     <ul id="waypoint-list"></ul>
@@ -136,8 +137,11 @@
         .easing(TWEEN.Easing.Linear.None)
         .onComplete(() => {
           // Reset waypoints after reaching the end
-          startWaypoint = null;
-          endWay        })
+                    startWaypoint = null;
+          endWaypoint = null;
+          document.getElementById('start-waypoint').textContent = 'None';
+          document.getElementById('end-waypoint').textContent = 'None';
+        })
         .start();
     }
 
