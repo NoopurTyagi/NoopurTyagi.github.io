@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-  <h1>3D demorgon model for navigation </h1>
+  <h1>3D </h1>
   <div id="waypoints" style="position: fixed; top: 0; right: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
     <h2>Waypoints</h2>
     <ul id="waypoint-list"></ul>
@@ -22,22 +22,21 @@
 
   <script>
     // Define the waypoints with adjusted coordinates
-    const scaleFactor = 0.01;
     const waypoints = [
-      { "id": 1, "name": "Entrance", "x": -8, "y": 0, "z": -3, "connected": [2] },
-      { "id": 2, "name": "Corridor Intersection", "x": -6, "y": 0, "z": -3, "connected": [1, 3, 4, 5, 6, 7] },
-      { "id": 3, "name": "Faculty Room 03", "x": -6, "y": 0, "z": -10, "connected": [2] }, // New location
-      { "id": 4, "name": "Faculty Room 004", "x": -2, "y": 0, "z": 2, "connected": [2] },
-      { "id": 5, "name": "Restroom 1", "x": -4, "y": 0, "z": -10, "connected": [2] }, // New location
-      { "id": 6, "name": "Restroom 2", "x": -2, "y": 0, "z": -10, "connected": [2] }, // New location
-      { "id": 7, "name": "Pantry", "x": -1, "y": 0, "z": -6, "connected": [2] }, // New location
+      { "id": 1, "name": "Entrance", "x": -8, "y": 0, "z": -3 },
+      { "id": 2, "name": "Corridor Intersection", "x": -6, "y": 0, "z": -3 },
+      { "id": 3, "name": "Faculty Room 03", "x": -6, "y": 0, "z": -10 },
+      { "id": 4, "name": "Faculty Room 004", "x": -2, "y": 0, "z": 2 },
+      { "id": 5, "name": "Restroom 1", "x": -4, "y": 0, "z": -10 },
+      { "id": 6, "name": "Restroom 2", "x": -2, "y": 0, "z": -10 },
+      { "id": 7, "name": "Pantry", "x": -1, "y": 0, "z": -6 }
     ];
 
     // Initialize the Three.js scene
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf0f0f0);
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 1, 10); // Adjusted the camera position for better visibility
+    camera.position.set(0, 1, 10);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
@@ -57,10 +56,10 @@
     scene.add(directionalLight);
 
     let waypointMap = {};
-    let markers = [];
     let startWaypoint = null;
     let endWaypoint = null;
-    let line = null;
+    let moveDuration = 2000; // Duration to move between waypoints in milliseconds
+    let cameraTween = null;
 
     // Function to handle errors
     function handleError(error) {
@@ -90,24 +89,22 @@
       waypoints.forEach(waypoint => {
         waypointMap[waypoint.id] = waypoint;
 
-        const markerGeometry = new THREE.SphereGeometry(0.3, 32, 32); // Increased size of the waypoints
-        const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        const marker = new THREE.Mesh(markerGeometry, markerMaterial);
-        marker.position.set(waypoint.x, waypoint.y, waypoint.z);
-        marker.name = waypoint.name;
-        marker.userData.id = waypoint.id;
-        scene.add(marker); // Add the marker to the scene
-        markers.push(marker);
+        const geometry = new THREE.SphereGeometry(0.1, 8, 8);
+        const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const dot = new THREE.Mesh(geometry, material);
+        dot.position.set(waypoint.x, waypoint.y, waypoint.z);
+        dot.name = waypoint.name;
+        scene.add(dot);
 
         const listItem = document.createElement('li');
-        listItem.textContent = waypoint.name; // Display waypoint name
+        listItem.textContent = waypoint.name;
         listItem.style.cursor = 'pointer';
         listItem.onclick = () => {
           selectWaypoint(waypoint.id);
         };
         waypointList.appendChild(listItem);
 
-        console.log(`Waypoint added: ${waypoint.name} at (${marker.position.x}, ${marker.position.y}, ${marker.position.z})`);
+        console.log(`Waypoint added: ${waypoint.name} at (${dot.position.x}, ${dot.position.y}, ${dot.position.z})`);
       });
     }
 
@@ -124,24 +121,41 @@
       }
     }
 
-    // Function to draw a line between start and end waypoints
+    // Function to navigate between waypoints
     function navigateToWaypoints(start, end) {
-      if (line) {
-        scene.remove(line);
+      if (cameraTween) {
+        cameraTween.stop();
       }
+
       const startVector = new THREE.Vector3(start.x, start.y, start.z);
       const endVector = new THREE.Vector3(end.x, end.y, end.z);
 
-      const geometry = new THREE.BufferGeometry().setFromPoints([startVector, endVector]);
-      const material = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 50 }); // Green and thick line
-      line = new THREE.Line(geometry, material);
-      scene.add(line);
+      // Move the camera from start waypoint to end waypoint
+      cameraTween = new TWEEN.Tween(camera.position)
+        .to({ x: endVector.x, y: endVector.y, z: endVector.z }, moveDuration)
+        .easing(TWEEN.Easing.Linear.None)
+        .onComplete(() => {
+          // Reset waypoints after reaching the end
+          startWaypoint = null;
+          endWay        })
+        .start();
     }
 
-    // Start the animation loop
+    // Function to handle resizing of the renderer when the window size changes
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // Event listener for window resize
+    window.addEventListener('resize', onWindowResize);
+
+    // Function to animate the scene
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
+      TWEEN.update(); // Update tween animations
       renderer.render(scene, camera);
     }
 
@@ -151,3 +165,4 @@
   </script>
 </body>
 </html>
+
