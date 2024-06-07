@@ -7,9 +7,12 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/lines/Line2.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/lines/LineGeometry.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/lines/LineMaterial.js"></script>
 </head>
 <body>
-  <h1>3D Model for Navigation</h1>
+  <h1>3D Model of Demorgon Navigation</h1>
   <div id="waypoints" style="position: fixed; top: 0; right: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
     <h2>Waypoints</h2>
     <ul id="waypoint-list"></ul>
@@ -22,7 +25,6 @@
 
   <script>
     // Define the waypoints with adjusted coordinates
-    const scaleFactor = 0.01;
     const waypoints = [
       { "id": 1, "name": "Entrance", "x": -8, "y": 0, "z": -3, "connected": [2] },
       { "id": 2, "name": "Corridor Intersection", "x": -6, "y": 0, "z": -3, "connected": [1, 3, 4, 5, 6, 7] },
@@ -131,9 +133,20 @@
       const startVector = new THREE.Vector3(start.x, start.y, start.z);
       const endVector = new THREE.Vector3(end.x, end.y, end.z);
 
-      const geometry = new THREE.BufferGeometry().setFromPoints([startVector, endVector]);
-      const material = new THREE.LineBasicMaterial({ color: 0x00ff00, linewidth: 5 }); // Green and thick line
-      line = new THREE.Line(geometry, material);
+      const positions = [];
+      positions.push(startVector.x, startVector.y, startVector.z);
+      positions.push(endVector.x, endVector.y, endVector.z);
+
+      const geometry = new THREE.LineGeometry();
+      geometry.setPositions(positions);
+
+      const material = new THREE.LineMaterial({
+        color: 0x00ff00, // Green color
+        linewidth: 0.01, // Line thickness
+      });
+
+      line = new THREE.Line2(geometry, material);
+      line.computeLineDistances();
       scene.add(line);
     }
 
