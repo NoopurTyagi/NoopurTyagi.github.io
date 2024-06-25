@@ -8,12 +8,6 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
   <style>
-    .visited {
-      font-weight: bold;
-      color: green;
-    }
-  </style>
-    <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
@@ -31,23 +25,25 @@
       font-size: 2.5em;
       color: #333;
     }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      max-width: 1200px;
+      padding: 20px;
+    }
     .panel {
-      background: linear-gradient(135deg, #ffffff 0%, #e6e9f0 100%);
+      background: #fff;
       padding: 20px;
       border-radius: 15px;
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
       margin: 10px;
       flex: 1;
-      max-width: 350px;
       min-width: 280px;
-    }
-    .waypoints-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: flex-start;
-      width: 100%;
-      max-width: 1200px;
+      max-width: 350px;
+      box-sizing: border-box;
+      overflow-y: auto;
     }
     .panel h2 {
       margin-top: 0;
@@ -66,9 +62,14 @@
       border-radius: 5px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       transition: background 0.3s;
+      cursor: pointer;
     }
     li:hover {
       background: #e6e6e6;
+    }
+    .visited {
+      font-weight: bold;
+      color: green;
     }
     button {
       background: #007bff;
@@ -95,30 +96,16 @@
       background: #218838;
       transform: translateY(-2px);
     }
-    .central-panel {
-      max-width: 100%;
+    .waypoints-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
       width: 100%;
-      text-align: center;
-      padding: 0 10px;
     }
-    .central-panel ul {
-      max-width: 500px;
-      margin: 0 auto;
-      text-align: left;
-    }
-    .central-panel button {
-      margin-top: 15px;
-    }
-    #path-waypoints{
-    position: relative !important;
-    bottom: 24px !important;
-    right: 377px !important;
-
-    }
-    #waypoints{
-    overflow: scroll !important;
-    height: 500px !important;
-
+    #waypoints {
+      max-height: 400px;
+      overflow-y: auto;
     }
     @media (max-width: 768px) {
       .panel {
@@ -131,36 +118,32 @@
         padding: 15px;
         font-size: 1.25em;
       }
-      .central-panel {
-        padding: 0 5%;
-      }
     }
   </style>
 </head>
 <body>
   <h1>3D Demogorgon Model</h1>
-  <div id="waypoints" style="position: fixed; top: 0; right: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
-    <h2>Waypoints</h2>
-    <ul id="waypoint-list"></ul>
+  <div class="container">
+    <div id="waypoints" class="panel">
+      <h2>Waypoints</h2>
+      <ul id="waypoint-list"></ul>
+    </div>
+    <div id="selected-waypoints" class="panel">
+      <h2>Selected Waypoints</h2>
+      <p>Start Waypoint: <span id="start-waypoint">None</span></p>
+      <p>End Waypoint: <span id="end-waypoint">None</span></p>
+    </div>
+    <div id="path-waypoints" class="panel">
+      <h2>Waypoints Along the Path</h2>
+      <ul id="path-waypoint-list"></ul>
+      <button id="next-waypoint-btn" onclick="showNextWaypoint()">Next Waypoint</button>
+      <p id="current-waypoint">Current Waypoint: None</p>
+      <p id="reached-message" style="display: none;">You have reached the destination!</p>
+    </div>
   </div>
-  <div id="selected-waypoints" style="position: fixed; bottom: 0; left: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
-    <h2>Selected Waypoints</h2>
-    <p>Start Waypoint: <span id="start-waypoint">None</span></p>
-    <p>End Waypoint: <span id="end-waypoint">None</span></p>
-  </div>
-  <div id="path-waypoints" style="position: fixed; bottom: 0; right: 0; background: rgba(255, 255, 255, 0.8); padding: 10px;">
-    <h2>Waypoints Along the Path</h2>
-    <ul id="path-waypoint-list"></ul>
-    <button id="next-waypoint-btn" onclick="showNextWaypoint()">Next Waypoint</button>
-    <p id="current-waypoint">Current Waypoint: None</p>
-    <p id="reached-message" style="display: none;">You have reached the destination!</p>
-  </div>
-
-  <button onclick="navigate()">Navigate</button>
+  <button id="navigate-btn" onclick="navigate()">Navigate</button>
   <script src="https://github.com/spite/THREE.MeshLine/blob/master/src/THREE.MeshLine.js"></script>
-
   <script>
-    // Define the waypoints
     const waypoints = [
       { id: 1, name: "Entrance", x: -8, y: 0, z: -3, connected: [2] },
       { id: 2, name: "Corridor Intersection", x: -6, y: 0, z: -3, connected: [1, 3, 4, 5, 6, 7, 8] },
@@ -178,7 +161,6 @@
       { id: 14, name: "First Floor Room 1", x: -1, y: 3.5, z: -1, connected: [13] }
     ];
 
-    // Ensure bidirectional connections
     waypoints.forEach(waypoint => {
       waypoint.connected.forEach(conn => {
         const neighbor = waypoints.find(w => w.id === conn);
@@ -188,7 +170,6 @@
       });
     });
 
-    // Initialize the Three.js scene
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf0f0f0);
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -203,218 +184,100 @@
     controls.screenSpacePanning = false;
     controls.maxPolarAngle = Math.PI / 2;
 
-    // Add lighting to the scene
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(5, 10, 7.5).normalize();
-    scene.add(directionalLight);
+    const loader = new THREE.GLTFLoader();
+    loader.load('https://NoopurTyagi.github.io/mymodel4.gltf', gltf => {
+      const model = gltf.scene;
+      model.position.set(0, -1, 0);
+      scene.add(model);
+    });
 
-    let waypointMap = {};
-    let markers = [];
-    let startWaypoint = null;
-    let endWaypoint = null;
-    let line = null;
-    let animatedObject = null;
-    let animationFrameId = null;
-    let animationPath = [];
-    let animationIndex = 0;
+    const startWaypoint = document.getElementById('start-waypoint');
+    const endWaypoint = document.getElementById('end-waypoint');
+    const waypointList = document.getElementById('waypoint-list');
+    const pathWaypointList = document.getElementById('path-waypoint-list');
+    const currentWaypoint = document.getElementById('current-waypoint');
+    const reachedMessage = document.getElementById('reached-message');
 
-    // Function to handle errors
-    function handleError(error) {
-      console.error("Error loading model:", error);
-      alert("Oops! There was an error loading the model. Please try again later.");
-    }
+    let startWaypointId = null;
+    let endWaypointId = null;
+    let pathWaypoints = [];
+    let currentWaypointIndex = 0;
 
-    // Function to load the GLTF model
-    function loadGltfModel() {
-      const loader = new THREE.GLTFLoader();
-      loader.load(
-        'https://NoopurTyagi.github.io/mymodel4.gltf',
-        (gltf) => {
-          scene.add(gltf.scene);
-          console.log('Model loaded successfully');
-          loadWaypoints(); // Load waypoints after model is loaded
-        },
-        undefined,
-        handleError
-      );
-    }
-
-    // Function to load and render waypoints
-    function loadWaypoints() {
-      const waypointList = document.getElementById('waypoint-list');
-
+    function populateWaypointList() {
       waypoints.forEach(waypoint => {
-        waypointMap[waypoint.id] = waypoint;
-
-        const listItem = document.createElement('li');
-        listItem.textContent = waypoint.name;
-        listItem.style.cursor = 'pointer';
-        listItem.onclick = () => {
-          selectWaypoint(waypoint.id);
-        };
-        waypointList.appendChild(listItem);
-
-        console.log(`Waypoint added: ${waypoint.name} at (${waypoint.x}, ${waypoint.y}, ${waypoint.z})`);
+        const li = document.createElement('li');
+        li.textContent = waypoint.name;
+        li.onclick = () => selectWaypoint(waypoint.id);
+        waypointList.appendChild(li);
       });
     }
 
-    // Function to handle waypoint selection
-    function selectWaypoint(waypointId) {
-      const waypoint = waypointMap[waypointId];
-      if (!startWaypoint) {
-        startWaypoint = waypoint;
-        document.getElementById('start-waypoint').textContent = waypoint.name;
-      } else if (!endWaypoint) {
-        endWaypoint = waypoint;
-        document.getElementById('end-waypoint').textContent = waypoint.name;
-        findPathAndDraw(startWaypoint, endWaypoint);
+    function selectWaypoint(id) {
+      if (!startWaypointId) {
+        startWaypointId = id;
+        startWaypoint.textContent = waypoints.find(w => w.id === id).name;
+      } else if (!endWaypointId) {
+        endWaypointId = id;
+        endWaypoint.textContent = waypoints.find(w => w.id === id).name;
+      } else {
+        alert('Both start and end waypoints are already selected.');
       }
     }
 
-    // Function to find path using BFS
-    function findPath(start, end) {
-      const queue = [[start.id]];
-      const visited = new Set();
-      visited.add(start.id);
+    function navigate() {
+      if (startWaypointId && endWaypointId) {
+        pathWaypoints = findPath(startWaypointId, endWaypointId);
+        pathWaypointList.innerHTML = '';
+        pathWaypoints.forEach(id => {
+          const li = document.createElement('li');
+          li.textContent = waypoints.find(w => w.id === id).name;
+          pathWaypointList.appendChild(li);
+        });
+        currentWaypointIndex = 0;
+        showNextWaypoint();
+      } else {
+        alert('Please select both start and end waypoints.');
+      }
+    }
 
-      while (queue.length > 0) {
-        const path = queue.shift();
-        const node = path[path.length - 1];
-
-        if (node === end.id) {
-          return path.map(id => waypointMap[id]);
-        }
-
-        for (const neighbor of waypointMap[node].connected) {
-          if (!visited.has(neighbor)) {
-            visited.add(neighbor);
-            const newPath = path.slice();
-            newPath.push(neighbor);
-            queue.push(newPath);
-          }
+    function showNextWaypoint() {
+      if (currentWaypointIndex < pathWaypoints.length) {
+        const waypoint = waypoints.find(w => w.id === pathWaypoints[currentWaypointIndex]);
+        currentWaypoint.textContent = waypoint.name;
+        currentWaypointIndex++;
+        if (currentWaypointIndex === pathWaypoints.length) {
+          reachedMessage.style.display = 'block';
         }
       }
+    }
 
+    function findPath(start, end) {
+      const queue = [{ id: start, path: [start] }];
+      const visited = new Set();
+      while (queue.length > 0) {
+        const { id, path } = queue.shift();
+        if (id === end) {
+          return path;
+        }
+        visited.add(id);
+        const currentWaypoint = waypoints.find(w => w.id === id);
+        currentWaypoint.connected.forEach(neighborId => {
+          if (!visited.has(neighborId)) {
+            queue.push({ id: neighborId, path: [...path, neighborId] });
+          }
+        });
+      }
       return [];
     }
 
-    // Function to draw path between waypoints
-    function findPathAndDraw(start, end) {
-      if (line) {
-        scene.remove(line);
-      }
-
-      const path = findPath(start, end);
-      if (path.length === 0) {
-        alert("No path found!");
-        return;
-      }
-
-      const points = path.map(waypoint => new THREE.Vector3(waypoint.x, waypoint.y, waypoint.z));
-      const geometry = new THREE.BufferGeometry().setFromPoints(points);
-      const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
-      line = new THREE.Line(geometry, material);
-      scene.add(line);
-
-
-      const pathWaypointList = document.getElementById('path-waypoint-list');
-      pathWaypointList.innerHTML = '';
-      path.forEach((waypoint, index) => {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${index + 1}. ${waypoint.name}`;
-        pathWaypointList.appendChild(listItem);
-      });
-
-      animationPath = path;
-      animationIndex = 5;
-
-      console.log('Path found and drawn');
-    }
-
-    // Function to start the animation along the path
-    function startAnimation(path) {
-      if (path.length < 2) {
-        console.log('Path too short for animation');
-        return;
-      }
-
-      if (animatedObject) {
-        scene.remove(animatedObject);
-      }
-
-      const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-      const material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
-      animatedObject = new THREE.Mesh(geometry, material);
-      scene.add(animatedObject);
-
-      animationPath = path;
-      animationIndex = 0;
-      moveAlongPath();
-    }
-
-    // Function to move the object along the path
-    function moveAlongPath() {
-      if (animationIndex >= animationPath.length) {
-        console.log('Animation completed');
-        return;
-      }
-
-      const waypoint = animationPath[animationIndex];
-      animatedObject.position.set(waypoint.x, waypoint.y, waypoint.z);
-    }
-
-    // Function to show the next waypoint
-    function showNextWaypoint() {
-      if (animationIndex >= animationPath.length - 1) {
-        document.getElementById('reached-message').style.display = 'block';
-      } else {
-        animationIndex++;
-        moveAlongPath();
-        const currentWaypoint = animationPath[animationIndex];
-        document.getElementById('current-waypoint').textContent = `Current Waypoint: ${currentWaypoint.name}`;
-        const pathWaypointList = document.getElementById('path-waypoint-list');
-        pathWaypointList.children[animationIndex].classList.add('visited');
-      }
-    }
-
-    // Function to start navigation
-    function navigate() {
-      if (!startWaypoint || !endWaypoint) {
-        alert("Please select both start and end waypoints");
-        return;
-      }
-      findPathAndDraw(startWaypoint, endWaypoint);
-      startAnimation(animationPath);
-    }
-
-    // Animation loop
-    function animate() {
-      requestAnimationFrame(animate);
+    populateWaypointList();
+    renderer.setAnimationLoop(() => {
       controls.update();
       renderer.render(scene, camera);
-    }
-
-    // Load the GLTF model and start the animation loop
-    loadGltfModel();
-    animate();
-
-    // Listen for device orientation events
-    window.addEventListener('deviceorientation', handleOrientation);
-
-    // Function to handle device orientation changes
-    function handleOrientation(event) {
-      const beta = event.beta; // Device tilt in the front-back direction
-      const gamma = event.gamma; // Device tilt in the left-right direction
-      const scaleFactor = 0.05; // Adjust scale factor as needed
-
-      camera.position.x += gamma * scaleFactor;
-      camera.position.z += beta * scaleFactor;
-    }
+    });
   </script>
 </body>
-</html> 
-
-
+</html>
