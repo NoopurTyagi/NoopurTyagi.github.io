@@ -5,24 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Navigation System</title>
     <style>
-        #add-waypoint-form, #path-waypoint-list {
+        body { margin: 0; }
+        canvas { display: block; }
+        #controls {
             position: fixed;
-            top: 0;
-            left: 0;
+            top: 10px;
+            left: 10px;
             background: rgba(255, 255, 255, 0.8);
             padding: 10px;
-            max-width: 200px;
-            overflow-y: auto;
-            height: 100vh;
         }
         #path-waypoint-list {
-            left: auto;
-            right: 0;
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
         }
     </style>
 </head>
 <body>
-    <div id="add-waypoint-form">
+    <div id="controls">
         <h2>Add Waypoint</h2>
         <label for="waypoint-name">Name:</label>
         <input type="text" id="waypoint-name" />
@@ -37,13 +39,15 @@
     <ul id="path-waypoint-list"></ul>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script>
-        let scene, camera, renderer, line, gltfModel;
+        let scene, camera, renderer, controls, line;
         let waypoints = [];
         let waypointMap = {};
         let markers = [];
         let animationPath = [];
         let animationIndex = 0;
+        let gltfModel;
 
         init();
         animate();
@@ -55,9 +59,13 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
 
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+
             const light = new THREE.DirectionalLight(0xffffff, 1);
             light.position.set(10, 10, 10).normalize();
             scene.add(light);
+
             camera.position.set(0, 5, 10);
 
             // Load glTF model
@@ -72,6 +80,7 @@
 
         function animate() {
             requestAnimationFrame(animate);
+            controls.update();
             renderer.render(scene, camera);
         }
 
@@ -85,12 +94,6 @@
             const newWaypoint = { id: newId, name, x, y, z, connected: [] };
             waypoints.push(newWaypoint);
             waypointMap[newId] = newWaypoint;
-
-            const listItem = document.createElement('li');
-            listItem.textContent = name;
-            listItem.style.cursor = 'pointer';
-            listItem.onclick = () => selectWaypoint(newId);
-            document.getElementById('waypoint-list').appendChild(listItem);
 
             const markerGeometry = new THREE.SphereGeometry(0.1, 32, 32);
             const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
@@ -228,7 +231,7 @@
 
         const realTimeData = {
             waypoints: [
-           { id: 1, name: "Entrance", x: -8, y: 0, z: -3, connected: [2] },
+               { id: 1, name: "Entrance", x: -8, y: 0, z: -3, connected: [2] },
       { id: 2, name: "Corridor Intersection", x: -6, y: 0, z: -3, connected: [1, 3, 4, 5, 6, 7, 8] },
       { id: 3, name: "Faculty Room 03", x: -6, y: 0, z: -10, connected: [2] },
       { id: 4, name: "Faculty Room 004", x: -2, y: 0, z: 2, connected: [2] },
@@ -258,3 +261,4 @@
     </script>
 </body>
 </html>
+
